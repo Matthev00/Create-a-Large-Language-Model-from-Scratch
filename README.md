@@ -5,7 +5,7 @@ train_py - script for training chat bot
 
 data_prep.py -script for preparing data from OpenWebText
 
-model_builder.py - basicly classes to recreate GPT architecture and func to create model
+model_builder.py - basicly classes to recreate GPT architecture and func to create model 
 
 utils.py - useful functions
 
