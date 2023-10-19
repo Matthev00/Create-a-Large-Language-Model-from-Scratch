@@ -1,6 +1,6 @@
 import torch
 from tqdm import tqdm
-from utils import get_batch, prepare_vocab, save_model
+from utils import get_batch, prepare_vocab, save_model, parse_arguments
 from model_builder import create_GPT_model
 
 
@@ -29,12 +29,13 @@ def estimate_loss(model,
 
 
 def main():
+    args = parse_arguments()
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    batch_size = 32
+    batch_size = args.batch_size
     block_size = 128
-    max_iters = 100
-    learning_rate = 3e-4
-    eval_steps = 50
+    max_iters = args.max_iters
+    learning_rate = args.lr
+    eval_steps = args.eval_steps
     model_name = "GPT_Model_trained_5000_epochs.pth"
 
     vocab_size, encode, decode = prepare_vocab()

@@ -2,6 +2,7 @@ import mmap
 import random
 import torch
 from pathlib import Path
+import argparse
 
 
 def prepare_vocab(file_path="data/preprocessed/vocab.txt"):
@@ -70,3 +71,31 @@ def save_model(model,
 
     torch.save(obj=model.state_dict(),
                f=model_save_path)
+
+
+def parse_arguments():
+    """
+    Parse arguments:
+    - bach_size
+    - max_iters
+    - lr (learning rate)
+    - eval_steps
+    """
+    parser = argparse.ArgumentParser(
+        description="Script trains LLM model(GPT architecture)"
+    )
+    parser.add_argument(
+        "--batch_size", type=int, default=32, help="Size of Batch"
+    )
+    parser.add_argument(
+        "--max_iters", type=int, default=1000, help="Range of training iterations"
+    )
+    parser.add_argument(
+        "--lr", type=float, default=3e-4, help="Learning rate"
+    )
+    parser.add_argument(
+        "--eval_steps", type=int, default=200, help="Evaluation steps"
+    )
+
+    args = parser.parse_args()
+    return args
