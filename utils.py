@@ -3,6 +3,9 @@ import random
 import torch
 from pathlib import Path
 import argparse
+from torch.utils.tensorboard import SummaryWriter
+import os
+from datetime import datetime
 
 
 def prepare_vocab(file_path="data/preprocessed/vocab.txt"):
@@ -99,3 +102,29 @@ def parse_arguments():
 
     args = parser.parse_args()
     return args
+
+
+def create_writer(experiment_name: str,
+                  model_name: str,
+                  extra: str = None) -> SummaryWriter:
+    """
+    Creates a torch.utils.tensorboard.writer.SummaryWriter() instance saving to a specific log_dir. # noqa 5501
+    log_dir is a combination of runs/timestamp/experiment_name/model_name/extra. # noqa 5501
+    Where timestamp is the current date in YYYY-MM-DD format.
+
+    Args:
+        experiment_name (str): Nome of experiment.
+        model_name (str): Name of the model.
+        extra (str, optional): Anything extra to add int dir . Defaults to None.
+
+    Returns:
+        SummaryWriter: instance of a writer
+    """
+    timestamp = datetime.now().strftime("%Y-%m-%d")
+    if extra:
+        # Create log directory path
+        log_dir = os.path.join("runs", timestamp, experiment_name, model_name, extra) # noqa 5501
+    else:
+        log_dir = os.path.join("runs", timestamp, experiment_name, model_name)
+
+    return SummaryWriter(log_dir=log_dir)
