@@ -6,6 +6,7 @@ import argparse
 from torch.utils.tensorboard import SummaryWriter
 import os
 from datetime import datetime
+from matplotlib import pyplot as plt
 
 
 def prepare_vocab(file_path="data/preprocessed/vocab.txt"):
@@ -128,3 +129,27 @@ def create_writer(experiment_name: str,
         log_dir = os.path.join("runs", timestamp, experiment_name, model_name)
 
     return SummaryWriter(log_dir=log_dir)
+
+
+def plot_loss_curves(results):
+    """Plots training curves of a results dictionary.
+
+    Args:
+        results (dict): dictionary containing list of values, e.g.
+            {"train_loss": [...],
+             "test_loss": [...]
+    """
+    loss = results["train_loss"]
+    test_loss = results["test_loss"]
+
+    epochs = range(len(results["train_loss"]))
+
+    plt.figure(figsize=(15, 7))
+
+    # Plot loss
+    plt.plot(epochs, loss, label="train_loss")
+    plt.plot(epochs, test_loss, label="test_loss")
+    plt.title("Loss")
+    plt.xlabel("Epochs")
+    plt.legend()
+    plt.show()
