@@ -83,7 +83,6 @@ def parse_arguments():
     - bach_size
     - max_iters
     - lr (learning rate)
-    - eval_steps
     """
     parser = argparse.ArgumentParser(
         description="Script trains LLM model(GPT architecture)"
@@ -96,9 +95,6 @@ def parse_arguments():
     )
     parser.add_argument(
         "--lr", type=float, default=3e-4, help="Learning rate"
-    )
-    parser.add_argument(
-        "--eval_steps", type=int, default=200, help="Evaluation steps"
     )
 
     args = parser.parse_args()
