@@ -1,7 +1,8 @@
 import torch
 from tqdm import tqdm
-from utils import get_batch, prepare_vocab, save_model, parse_arguments
+from utils import get_batch, prepare_vocab, save_model, parse_arguments, create_writer, plot_loss_curves # noqa 5501
 from model_builder import create_GPT_model
+from engine import train
 
 
 def estimate_loss(model,
@@ -34,9 +35,10 @@ def main():
     batch_size = args.batch_size
     block_size = 128
     max_iters = args.max_iters
+    max_iters = 10
     learning_rate = args.lr
     eval_steps = args.eval_steps
-    model_name = "GPT_Model_trained_5000_epochs.pth"
+    model_name = "GPT_Model_trained_6500_epochs.pth"
 
     vocab_size, encode, decode = prepare_vocab()
 
@@ -44,40 +46,50 @@ def main():
                              device=device)
 
     model.load_state_dict(torch.load(
-        f="models/GPT_Model_trained_5000_epochs.pth",
+        f="models/GPT_Model_trained_6500_epochs.pth",
         map_location=torch.device(device)))
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
 
-    for i in tqdm(range(max_iters)):
-        # test
-        if i % eval_steps == 0:
-            step_results = estimate_loss(model=model,
-                                         eval_iters=eval_steps,
-                                         block_size=block_size,
-                                         batch_size=batch_size,
-                                         encode_fn=encode,
-                                         device=device)
-            print(f"step: {i}, train loss: {step_results['train']:.3f}, val loss: {step_results['val']:.3f}") # noqa 5501
+    results = train(model=model,
+                    optimizer=optimizer,
+                    writer=create_writer(experiment_name="6500-6700_epochs",
+                                         model_name="GPT"),
+                    epochs=max_iters,
+                    encode=encode,
+                    device=device,
+                    block_size=block_size,
+                    batch_size=batch_size)
+    # for i in tqdm(range(max_iters)):
+    #     # test
+    #     if i % eval_steps == 0:
+    #         step_results = estimate_loss(model=model,
+    #                                      eval_iters=eval_steps,
+    #                                      block_size=block_size,
+    #                                      batch_size=batch_size,
+    #                                      encode_fn=encode,
+    #                                      device=device)
+    #         print(f"step: {i}, train loss: {step_results['train']:.3f}, val loss: {step_results['val']:.3f}") # noqa 5501
 
-        # Train
+    #     # Train
 
-        # get samle batch of data
-        X, y = get_batch(split="train",
-                         block_size=block_size,
-                         batch_size=batch_size,
-                         encode_fn=encode,
-                         device=device)
+    #     # get samle batch of data
+    #     X, y = get_batch(split="train",
+    #                      block_size=block_size,
+    #                      batch_size=batch_size,
+    #                      encode_fn=encode,
+    #                      device=device)
 
-        logits, loss = model(X, y)
-        optimizer.zero_grad(set_to_none=True)
-        loss.backward()
-        optimizer.step()
+    #     logits, loss = model(X, y)
+    #     optimizer.zero_grad(set_to_none=True)
+    #     loss.backward()
+    #     optimizer.step()
 
-    print(loss.item())
+    # print(loss.item())
 
-    save_model(model=model,
-               model_name=model_name)
+    # save_model(model=model,
+    #            model_name=model_name)
+    plot_loss_curves(results=results)
 
 
 if __name__ == "__main__":
