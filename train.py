@@ -2,6 +2,7 @@ import torch
 from utils import get_batch, prepare_vocab, save_model, parse_arguments, create_writer, plot_loss_curves # noqa 5501
 from model_builder import create_GPT_model
 from engine import train
+from statistics import mean
 
 
 def main():
@@ -11,7 +12,7 @@ def main():
     block_size = 128
     max_iters = args.max_iters
     learning_rate = args.lr
-    model_id = 6500
+    model_id = 7500
 
     vocab_size, encode, decode = prepare_vocab()
 
@@ -28,7 +29,8 @@ def main():
                     optimizer=optimizer,
                     writer=create_writer(
                         experiment_name=f"{model_id}-{model_id+max_iters}_epochs", # noqa 5501
-                        model_name="GPT"),
+                        model_name="GPT",
+                        extra="1e-5_lr"),
                     epochs=max_iters,
                     encode=encode,
                     device=device,
@@ -37,9 +39,10 @@ def main():
 
     save_model(
         model=model,
-        model_name=f"models/GPT_Model_trained_{model_id+max_iters}_epochs.pth")
+        model_name=f"GPT_Model_trained_{model_id+max_iters}_epochs.pth")
 
     plot_loss_curves(results=results)
+    print(mean(results["train_loss"]))
 
 
 if __name__ == "__main__":
