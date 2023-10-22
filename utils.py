@@ -26,6 +26,28 @@ def prepare_vocab(file_path="data/preprocessed/vocab.txt"):
     return vocab_size, encode, decode
 
 
+def get_prompt_and_ans(split,
+                       block_size,
+                       batch_size,
+                       encode):
+    filename = "data/TruthfulQA/finetune_info.jsonl" if split == 'train' else "data/TruthfulQA/finetune_info.jsonl" # noqa 5501
+    text = ""
+    start_index = len("{'prompt': 'Q: ")
+    with open(filename, "r") as f:
+        lines = f.readlines()
+
+    for line in lines:
+        if line.find('"completion": " yes"'):
+            end_index = line.find("Helpful:")
+            line = line[start_index:end_index]
+            text += line.replace("A: ", "")
+
+    start_pos = random.randint(0, len(text) - block_size*batch_size)
+    end_pos = start_pos + block_size*batch_size
+    sample = text[start_pos:end_pos]
+    return sample
+
+
 def get_random_chunk(split,
                      block_size,
                      batch_size,
@@ -149,3 +171,17 @@ def plot_loss_curves(results):
     plt.xlabel("Epochs")
     plt.legend()
     plt.show()
+
+
+def main():
+    sample = get_prompt_and_ans(split="train",
+                             block_size=128,
+                             batch_size=32,
+                             encode="a")
+    print(sample)
+    print(len(sample))
+
+
+
+if __name__ == "__main__":
+    main()
