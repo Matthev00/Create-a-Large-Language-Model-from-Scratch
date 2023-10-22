@@ -12,7 +12,7 @@ def main():
     block_size = 128
     max_iters = args.max_iters
     learning_rate = args.lr
-    model_id = 7500
+    model_id = 8500
 
     vocab_size, encode, decode = prepare_vocab()
 
@@ -30,16 +30,17 @@ def main():
                     writer=create_writer(
                         experiment_name=f"{model_id}-{model_id+max_iters}_epochs", # noqa 5501
                         model_name="GPT",
-                        extra="1e-5_lr"),
+                        extra=f"{learning_rate}_lr"),
                     epochs=max_iters,
                     encode=encode,
                     device=device,
                     block_size=block_size,
-                    batch_size=batch_size)
+                    batch_size=batch_size,
+                    finetuning=True)
 
-    save_model(
-        model=model,
-        model_name=f"GPT_Model_trained_{model_id+max_iters}_epochs.pth")
+    # save_model(
+    #     model=model,
+    #     model_name=f"GPT_Model_trained_{model_id+max_iters}_epochs.pth")
 
     plot_loss_curves(results=results)
     print(mean(results["train_loss"]))
