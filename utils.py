@@ -26,10 +26,10 @@ def prepare_vocab(file_path="data/preprocessed/vocab.txt"):
     return vocab_size, encode, decode
 
 
-def get_prompt_and_ans(split,
-                       block_size,
-                       batch_size,
-                       encode):
+def get_finetunning_data(split,
+                         block_size,
+                         batch_size,
+                         encode):
     filename = "data/TruthfulQA/finetune_info.jsonl" if split == 'train' else "data/TruthfulQA/finetune_info.jsonl" # noqa 5501
     text = ""
     start_index = len("{'prompt': 'Q: ")
@@ -45,7 +45,9 @@ def get_prompt_and_ans(split,
     start_pos = random.randint(0, len(text) - block_size*batch_size)
     end_pos = start_pos + block_size*batch_size
     sample = text[start_pos:end_pos]
-    return sample
+
+    data = torch.tensor(encode(sample), dtype=torch.long)
+    return data
 
 
 def get_random_chunk(split,
@@ -113,7 +115,7 @@ def parse_arguments():
         "--batch_size", type=int, default=32, help="Size of Batch"
     )
     parser.add_argument(
-        "--max_iters", type=int, default=1000, help="Range of training iterations"
+        "--max_iters", type=int, default=1000, help="Range of training iterations" # noqa 5501
     )
     parser.add_argument(
         "--lr", type=float, default=3e-4, help="Learning rate"
@@ -174,13 +176,13 @@ def plot_loss_curves(results):
 
 
 def main():
-    sample = get_prompt_and_ans(split="train",
-                             block_size=128,
-                             batch_size=32,
-                             encode="a")
+    sample = get_finetunning_data(
+        split="train",
+        block_size=128,
+        batch_size=32,
+        encode="a")
     print(sample)
     print(len(sample))
-
 
 
 if __name__ == "__main__":
