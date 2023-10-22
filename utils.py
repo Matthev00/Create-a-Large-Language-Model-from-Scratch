@@ -78,11 +78,18 @@ def get_batch(split,
               block_size,
               batch_size,
               encode_fn,
-              device: torch.device = 'cuda:0'):
-    data = get_random_chunk(split=split,
-                            block_size=block_size,
-                            batch_size=batch_size,
-                            encode=encode_fn)
+              device: torch.device = 'cuda:0',
+              finetuning=False):
+    if finetuning:
+        data = get_finetunning_data(split=split,
+                                    block_size=block_size,
+                                    batch_size=batch_size,
+                                    encode=encode_fn)
+    else:
+        data = get_random_chunk(split=split,
+                                block_size=block_size,
+                                batch_size=batch_size,
+                                encode=encode_fn)
     ix = torch.randint(len(data) - block_size, (batch_size,))
     x = torch.stack([data[i:i+block_size] for i in ix])
     y = torch.stack([data[i+1:i+block_size+1] for i in ix])
