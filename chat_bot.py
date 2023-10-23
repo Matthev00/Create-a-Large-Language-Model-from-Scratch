@@ -12,7 +12,7 @@ def main():
                              device=device)
 
     model.load_state_dict(torch.load(
-        f="models/GPT_Model_trained_5000_epochs.pth",
+        f="models/GPT_Model_trained_8500_epochs.pth",
         map_location=torch.device(device)))
 
     prompt = torch.tensor(encode(input("Input question: ")),

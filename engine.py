@@ -5,15 +5,17 @@ from tqdm.auto import tqdm
 from utils import get_batch
 
 
-def train(model: torch.nn.Module,
-          optimizer: torch.optim,
-          writer: SummaryWriter,
-          epochs: int,
-          encode,
-          device: torch.device = 'cuda:0',
-          block_size: int = 128,
-          batch_size: int = 32,
-          finetuning=False):
+def train(
+    model: torch.nn.Module,
+    optimizer: torch.optim,
+    writer: SummaryWriter,
+    epochs: int,
+    encode,
+    device: torch.device = "cuda:0",
+    block_size: int = 128,
+    batch_size: int = 32,
+    finetuning=False,
+):
     """
     Trains and tests a PyTorch model.
 
@@ -32,48 +34,54 @@ def train(model: torch.nn.Module,
         encode: function to encode tokens
 
     Returns:
-        A dictionary of training and testing loss. Each metric has a value in a list for
+        A dictionary of training and testing loss. Each metric has a value in a list for # noqa 5501
         each epoch.
     """
 
     # Create empty results dict
-    results = {"train_loss": [],
-               "test_loss": []}
+    results = {"train_loss": [], "test_loss": []}
 
     for epoch in tqdm(range(epochs)):
-        train_loss = train_step(model=model,
-                                optimizer=optimizer,
-                                encode=encode,
-                                device=device,
-                                block_size=block_size,
-                                batch_size=batch_size,
-                                finetuning=finetuning)
-        test_loss = test_step(model=model,
-                              encode=encode,
-                              device=device,
-                              block_size=block_size,
-                              batch_size=batch_size,
-                              finetuning=finetuning)
+        train_loss = train_step(
+            model=model,
+            optimizer=optimizer,
+            encode=encode,
+            device=device,
+            block_size=block_size,
+            batch_size=batch_size,
+            finetuning=finetuning,
+        )
+        test_loss = test_step(
+            model=model,
+            encode=encode,
+            device=device,
+            block_size=block_size,
+            batch_size=batch_size,
+            finetuning=finetuning,
+        )
 
         results["train_loss"].append(train_loss)
         results["test_loss"].append(test_loss)
 
-        writer.add_scalars(main_tag='Loss',
-                           tag_scalar_dict={"train_loss": train_loss,
-                                            "test_loss": test_loss},
-                           global_step=epoch)
+        writer.add_scalars(
+            main_tag="Loss",
+            tag_scalar_dict={"train_loss": train_loss, "test_loss": test_loss},
+            global_step=epoch,
+        )
 
     writer.close()
     return results
 
 
-def train_step(model: torch.nn.Module,
-               optimizer: torch.optim,
-               encode,
-               device: torch.device = 'cuda:0',
-               block_size: int = 128,
-               batch_size: int = 32,
-               finetuning=False):
+def train_step(
+    model: torch.nn.Module,
+    optimizer: torch.optim,
+    encode,
+    device: torch.device = "cuda:0",
+    block_size: int = 128,
+    batch_size: int = 32,
+    finetuning=False,
+):
     """
     Trains a PyTorch model for single epoch
 
@@ -84,12 +92,14 @@ def train_step(model: torch.nn.Module,
     """
     model.train()
 
-    X, y = get_batch(split="train",
-                     block_size=block_size,
-                     batch_size=batch_size,
-                     encode_fn=encode,
-                     device=device,
-                     finetuning=finetuning)
+    X, y = get_batch(
+        split="train",
+        block_size=block_size,
+        batch_size=batch_size,
+        encode_fn=encode,
+        device=device,
+        finetuning=finetuning,
+    )
 
     logits, loss = model(X, y)
     optimizer.zero_grad(set_to_none=True)
@@ -99,21 +109,24 @@ def train_step(model: torch.nn.Module,
     return loss.item()
 
 
-def test_step(model: torch.nn.Module,
-              encode,
-              device: torch.device = 'cuda:0',
-              block_size: int = 128,
-              batch_size: int = 32,
-              finetuning=False):
-
+def test_step(
+    model: torch.nn.Module,
+    encode,
+    device: torch.device = "cuda:0",
+    block_size: int = 128,
+    batch_size: int = 32,
+    finetuning=False,
+):
     model.eval()
     with torch.inference_mode():
-        X, y = get_batch(split="test",
-                         block_size=block_size,
-                         batch_size=batch_size,
-                         encode_fn=encode,
-                         device=device,
-                         finetuning=finetuning)
+        X, y = get_batch(
+            split="test",
+            block_size=block_size,
+            batch_size=batch_size,
+            encode_fn=encode,
+            device=device,
+            finetuning=finetuning,
+        )
         logits, loss = model(X, y)
 
     return loss.item()

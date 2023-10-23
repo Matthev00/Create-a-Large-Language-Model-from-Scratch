@@ -22,16 +22,17 @@ def prepare_vocab(file_path="data/preprocessed/vocab.txt"):
     int_to_ch = {i: ch for i, ch in enumerate(chars)}
 
     encode = lambda s: [str_to_int[c] for c in s]
-    decode = lambda t: ''.join([int_to_ch[n] for n in t])
+    decode = lambda t: "".join([int_to_ch[n] for n in t])
 
     return vocab_size, encode, decode
 
 
-def get_finetunning_data(split,
-                         block_size,
-                         batch_size,
-                         encode):
-    filename = "data/TruthfulQA/finetune_info.jsonl" if split == 'train' else "data/TruthfulQA/finetune_info.jsonl" # noqa 5501
+def get_finetunning_data(split, block_size, batch_size, encode):
+    filename = (
+        "data/TruthfulQA/finetune_info.jsonl"
+        if split == "train"
+        else "data/TruthfulQA/finetune_info.jsonl"
+    )  # noqa 5501
     text = ""
     start_index = len("{'prompt': 'Q: ")
     openings = []
@@ -45,41 +46,44 @@ def get_finetunning_data(split,
             text += line.replace("A: ", "")
             openings.append(len(text))
 
-    random_start = random.randint(0, len(text) - block_size*batch_size)
-    start_pos = find_first_lower(arr=openings,
-                                 index=random_start)
-    end_pos = start_pos + block_size*batch_size
+    random_start = random.randint(0, len(text) - block_size * batch_size)
+    start_pos = find_first_lower(arr=openings, index=random_start)
+    end_pos = start_pos + block_size * batch_size
     sample = text[start_pos:end_pos]
 
     data = torch.tensor(encode(sample), dtype=torch.long)
     return data
 
 
-def find_first_lower(arr: List,
-                     index: int):
+def find_first_lower(arr: List, index: int):
     arr = reversed(arr)
     for element in arr:
         if element < index:
             return element
 
 
-def get_random_chunk(split,
-                     block_size,
-                     batch_size,
-                     encode):
-    filename = "data/preprocessed/train_split.txt" if split == 'train' else "data/preprocessed/val_split.txt" # noqa 5501
-    with open(filename, 'rb') as f:
+def get_random_chunk(split, block_size, batch_size, encode):
+    filename = (
+        "data/preprocessed/train_split.txt"
+        if split == "train"
+        else "data/preprocessed/val_split.txt"
+    )  # noqa 5501
+    with open(filename, "rb") as f:
         with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as mm:
             # Determine the file size and a random position to start reading
             file_size = len(mm)
-            start_pos = random.randint(0, (file_size) - block_size*batch_size)
+            start_pos = random.randint(
+                0, (file_size) - block_size * batch_size
+            )  # noqa 5501
 
             # Seek to the random position and read the block of text
             mm.seek(start_pos)
-            block = mm.read(block_size*batch_size-1)
+            block = mm.read(block_size * batch_size - 1)
 
             # Decode the block to a string, ignoring any invalid byte sequences
-            decoded_block = block.decode('utf-8', errors='ignore').replace('\r', '') # noqa 5501
+            decoded_block = block.decode("utf-8", errors="ignore").replace(
+                "\r", ""
+            )  # noqa 5501
 
             # Train and test splits
             data = torch.tensor(encode(decoded_block), dtype=torch.long)
@@ -87,38 +91,42 @@ def get_random_chunk(split,
     return data
 
 
-def get_batch(split,
-              block_size,
-              batch_size,
-              encode_fn,
-              device: torch.device = 'cuda:0',
-              finetuning=False):
+def get_batch(
+    split,
+    block_size,
+    batch_size,
+    encode_fn,
+    device: torch.device = "cuda:0",
+    finetuning=False,
+):
     if finetuning:
-        data = get_finetunning_data(split=split,
-                                    block_size=block_size,
-                                    batch_size=batch_size,
-                                    encode=encode_fn)
+        data = get_finetunning_data(
+            split=split,
+            block_size=block_size,
+            batch_size=batch_size,
+            encode=encode_fn,  # noqa 5501
+        )
     else:
-        data = get_random_chunk(split=split,
-                                block_size=block_size,
-                                batch_size=batch_size,
-                                encode=encode_fn)
+        data = get_random_chunk(
+            split=split,
+            block_size=block_size,
+            batch_size=batch_size,
+            encode=encode_fn,  # noqa 5501
+        )
     ix = torch.randint(len(data) - block_size, (batch_size,))
-    x = torch.stack([data[i:i+block_size] for i in ix])
-    y = torch.stack([data[i+1:i+block_size+1] for i in ix])
+    x = torch.stack([data[i : i + block_size] for i in ix])
+    y = torch.stack([data[i + 1 : i + block_size + 1] for i in ix])
     x, y = x.to(device), y.to(device)
     return x, y
 
 
-def save_model(model,
-               model_name):
+def save_model(model, model_name):
     target_dir_path = Path("models")
     target_dir_path.mkdir(parents=True, exist_ok=True)
 
     model_save_path = target_dir_path / model_name
 
-    torch.save(obj=model.state_dict(),
-               f=model_save_path)
+    torch.save(obj=model.state_dict(), f=model_save_path)
 
 
 def parse_arguments():
@@ -133,21 +141,22 @@ def parse_arguments():
     )
     parser.add_argument(
         "--batch_size", type=int, default=32, help="Size of Batch"
-    )
+    )  # noqa 5501
     parser.add_argument(
-        "--max_iters", type=int, default=1000, help="Range of training iterations" # noqa 5501
+        "--max_iters",
+        type=int,
+        default=1000,
+        help="Range of training iterations",  # noqa 5501
     )
-    parser.add_argument(
-        "--lr", type=float, default=3e-4, help="Learning rate"
-    )
+    parser.add_argument("--lr", type=float, default=3e-4, help="Learning rate")
 
     args = parser.parse_args()
     return args
 
 
-def create_writer(experiment_name: str,
-                  model_name: str,
-                  extra: str = None) -> SummaryWriter:
+def create_writer(
+    experiment_name: str, model_name: str, extra: str = None
+) -> SummaryWriter:
     """
     Creates a torch.utils.tensorboard.writer.SummaryWriter() instance saving to a specific log_dir. # noqa 5501
     log_dir is a combination of runs/timestamp/experiment_name/model_name/extra. # noqa 5501
@@ -164,7 +173,9 @@ def create_writer(experiment_name: str,
     timestamp = datetime.now().strftime("%Y-%m-%d")
     if extra:
         # Create log directory path
-        log_dir = os.path.join("runs", timestamp, experiment_name, model_name, extra) # noqa 5501
+        log_dir = os.path.join(
+            "runs", timestamp, experiment_name, model_name, extra
+        )  # noqa 5501
     else:
         log_dir = os.path.join("runs", timestamp, experiment_name, model_name)
 
@@ -197,10 +208,8 @@ def plot_loss_curves(results):
 
 def main():
     sample = get_finetunning_data(
-        split="train",
-        block_size=128,
-        batch_size=32,
-        encode="a")
+        split="train", block_size=128, batch_size=32, encode="a"
+    )
     print(sample)
     print(len(sample))
 

@@ -1,5 +1,12 @@
 import torch
-from utils import get_batch, prepare_vocab, save_model, parse_arguments, create_writer, plot_loss_curves # noqa 5501
+from utils import (
+    get_batch,
+    prepare_vocab,
+    save_model,
+    parse_arguments,
+    create_writer,
+    plot_loss_curves,
+)
 from model_builder import create_GPT_model
 from engine import train
 from statistics import mean
@@ -7,40 +14,46 @@ from statistics import mean
 
 def main():
     args = parse_arguments()
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     batch_size = args.batch_size
     block_size = 128
     max_iters = args.max_iters
     learning_rate = args.lr
-    model_id = 8500
+    model_id = 10500
 
     vocab_size, encode, decode = prepare_vocab()
 
-    model = create_GPT_model(vocab_size=vocab_size,
-                             device=device)
+    model = create_GPT_model(vocab_size=vocab_size, device=device)
 
-    model.load_state_dict(torch.load(
-        f=f"models/GPT_Model_trained_{model_id}_epochs.pth",
-        map_location=torch.device(device)))
+    model.load_state_dict(
+        torch.load(
+            f=f"models/GPT_Model_trained_{model_id}_epochs_finetuned.pth",
+            map_location=torch.device(device),
+        )
+    )
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
 
-    results = train(model=model,
-                    optimizer=optimizer,
-                    writer=create_writer(
-                        experiment_name=f"{model_id}-{model_id+max_iters}_epochs", # noqa 5501
-                        model_name="GPT",
-                        extra=f"{learning_rate}_lr"),
-                    epochs=max_iters,
-                    encode=encode,
-                    device=device,
-                    block_size=block_size,
-                    batch_size=batch_size,
-                    finetuning=True)
+    results = train(
+        model=model,
+        optimizer=optimizer,
+        writer=create_writer(
+            experiment_name=f"{model_id}-{model_id+max_iters}_epochs",
+            model_name="GPT",
+            extra="finetuning",
+        ),
+        epochs=max_iters,
+        encode=encode,
+        device=device,
+        block_size=block_size,
+        batch_size=batch_size,
+        finetuning=True,
+    )
 
-    # save_model(
-    #     model=model,
-    #     model_name=f"GPT_Model_trained_{model_id+max_iters}_epochs.pth")
+    save_model(
+        model=model,
+        model_name=f"GPT_Model_trained_{model_id+max_iters}_epochs_finetuned.pth", # noqa 5501
+    )
 
     plot_loss_curves(results=results)
     print(mean(results["train_loss"]))
