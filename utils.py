@@ -7,6 +7,7 @@ from torch.utils.tensorboard import SummaryWriter
 import os
 from datetime import datetime
 from matplotlib import pyplot as plt
+from typing import List
 
 
 def prepare_vocab(file_path="data/preprocessed/vocab.txt"):
@@ -33,6 +34,7 @@ def get_finetunning_data(split,
     filename = "data/TruthfulQA/finetune_info.jsonl" if split == 'train' else "data/TruthfulQA/finetune_info.jsonl" # noqa 5501
     text = ""
     start_index = len("{'prompt': 'Q: ")
+    openings = []
     with open(filename, "r") as f:
         lines = f.readlines()
 
@@ -41,13 +43,24 @@ def get_finetunning_data(split,
             end_index = line.find("Helpful:")
             line = line[start_index:end_index]
             text += line.replace("A: ", "")
+            openings.append(len(text))
 
-    start_pos = random.randint(0, len(text) - block_size*batch_size)
+    random_start = random.randint(0, len(text) - block_size*batch_size)
+    start_pos = find_first_lower(arr=openings,
+                                 index=random_start)
     end_pos = start_pos + block_size*batch_size
     sample = text[start_pos:end_pos]
 
     data = torch.tensor(encode(sample), dtype=torch.long)
     return data
+
+
+def find_first_lower(arr: List,
+                     index: int):
+    arr = reversed(arr)
+    for element in arr:
+        if element < index:
+            return element
 
 
 def get_random_chunk(split,
