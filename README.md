@@ -5,7 +5,7 @@ train_py - script for training chat bot
 
 data_prep.py -script for preparing data from OpenWebText
 
-model_builder.py - basicly classes to recreate GPT architecture and func to create model 
+model_builder.py - basicly classes to recreate GPT architecture and func to create model
 
 utils.py - useful functions
 
@@ -16,10 +16,11 @@ gpt-v1.ipynb - proces of my learnig learnig LLM's
 
 # To do
 ## Data
-fine tune using datasets from hugging face
++ fine tune using datasets from hugging face
+- another dataset is needed
 ## Training
-create new test and train step for training loop
-train for longer
++ reate new test and train step for training loop
++ train for longer
 
 # Resources
 ## Create-a-Large-Language-Model-from-Scratch
