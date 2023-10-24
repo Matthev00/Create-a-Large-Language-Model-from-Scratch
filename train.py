@@ -19,7 +19,7 @@ def main():
     block_size = 128
     max_iters = args.max_iters
     learning_rate = args.lr
-    model_id = 10500
+    model_id = 11500
 
     vocab_size, encode, decode = prepare_vocab()
 
