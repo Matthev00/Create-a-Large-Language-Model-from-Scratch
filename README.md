@@ -33,6 +33,7 @@ time 4:02:09
 
 https://towardsdatascience.com/fine-tuning-large-language-models-llms-23473d763b91
 https://www.ml6.eu/blogpost/to-fine-tune-or-not-to-fine-tune-that-is-the-question
+https://platform.openai.com/docs/guides/fine-tuning/preparing-your-dataset
 
 ## Research Papers
 Attention is All You Need - https://arxiv.org/pdf/1706.03762.pdf
