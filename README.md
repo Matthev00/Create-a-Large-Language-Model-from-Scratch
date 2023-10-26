@@ -31,16 +31,17 @@ Based on https://www.youtube.com/watch?v=UU1WVnMk4E8&amp;list=WL&amp;index=10&am
 
 time 4:02:09
 
-https://towardsdatascience.com/fine-tuning-large-language-models-llms-23473d763b91
-https://www.ml6.eu/blogpost/to-fine-tune-or-not-to-fine-tune-that-is-the-question
-https://platform.openai.com/docs/guides/fine-tuning/preparing-your-dataset
-
 ## Research Papers
 Attention is All You Need - https://arxiv.org/pdf/1706.03762.pdf
 
 A Survey of LLMs - https://arxiv.org/pdf/2303.18223.pdf
 
 QLoRA: Efficient Finetuning of Quantized LLMs - https://arxiv.org/pdf/2305.14314.pdf
+
+https://towardsdatascience.com/fine-tuning-large-language-models-llms-23473d763b91
+https://www.ml6.eu/blogpost/to-fine-tune-or-not-to-fine-tune-that-is-the-question - read
+https://platform.openai.com/docs/guides/fine-tuning/preparing-your-dataset
+https://bdtechtalks.com/2023/01/16/what-is-rlhf/
 
 ## Data resources
 OpenWebText Download - https://skylion007.github.io/OpenWebTextCorpus/
