@@ -17,10 +17,11 @@ gpt-v1.ipynb - proces of my learnig learnig LLM's
 # To do
 ## Data
 + fine tune using datasets from hugging face
-- another dataset is needed
+- another dataset is needed!!!!
 ## Training
 + reate new test and train step for training loop
 + train for longer
+
 
 # Isssues
 finetuning dameges results on basic model
@@ -28,6 +29,8 @@ finetuning dameges results on basic model
 # Resources
 ## Create-a-Large-Language-Model-from-Scratch
 Based on https://www.youtube.com/watch?v=UU1WVnMk4E8&amp;list=WL&amp;index=10&amp;ab_channel=freeCodeCamp.org
+
+https://huggingface.co/datasets/katielink/healthsearchqa/viewer/all_data
 
 time 4:02:09
 
