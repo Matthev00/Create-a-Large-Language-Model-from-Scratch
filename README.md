@@ -21,7 +21,7 @@ gpt-v1.ipynb - proces of my learnig learnig LLM's
 ## Training
 + reate new test and train step for training loop
 + train for longer
--train on basic data for next 4000 iters
+- train on basic data for next 4000 iters
 - finetune to the medical version
 
 # Isssues
@@ -33,6 +33,7 @@ Based on https://www.youtube.com/watch?v=UU1WVnMk4E8&amp;list=WL&amp;index=10&am
 
 https://huggingface.co/datasets/katielink/healthsearchqa/viewer/all_data
 "E:\projekty python\Create-a-Large-Language-Model-from-Scratch\data\finetuning_med\41586_2023_6291_MOESM6_ESM.xlsx"
+E:\projekty python\Create-a-Large-Language-Model-from-Scratch\data\finetuning_med\raw
 
 time 4:02:09
 
