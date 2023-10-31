@@ -3,6 +3,7 @@ import lzma
 from tqdm import tqdm
 from pathlib import Path
 import json
+from typing import List
 
 
 def xz_files_in_dir(directory):
@@ -77,13 +78,14 @@ def extract_qa_from_json(file_path: Path) -> str:
 
 
 def get_paths(dir_path: Path) -> List[Path]:
-
-
+    return [plik for plik in dir_path.iterdir() if plik.is_file()]
 
 
 def main():
-    dir_path = "E:/projekty python/Create-a-Large-Language-Model-from-Scratch/data/finetuning_med/raw"
-    
+    dir_path = Path("E:/projekty python/Create-a-Large-Language-Model-from-Scratch/data/finetuning_med/raw")
+    file_paths = get_paths(dir_path=dir_path)
+    print(file_paths)
+
 
 if __name__ == "__main__":
     main()
