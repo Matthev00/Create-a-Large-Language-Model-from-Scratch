@@ -21,7 +21,7 @@ gpt-v1.ipynb - proces of my learnig learnig LLM's
 ## Training
 + reate new test and train step for training loop
 + train for longer
-- train on basic data for next 4000 iters
++ train on basic data for next 4000 iters
 - finetune to the medical version
 
 # Isssues

@@ -4,7 +4,6 @@ from tqdm import tqdm
 from pathlib import Path
 import json
 from typing import List, Tuple
-import re
 
 
 def xz_files_in_dir(directory):

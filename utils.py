@@ -1,6 +1,7 @@
 import mmap
 import random
 import torch
+from torch import tensor
 from pathlib import Path
 import argparse
 from torch.utils.tensorboard import SummaryWriter
@@ -27,7 +28,9 @@ def prepare_vocab(file_path="data/preprocessed/vocab.txt"):
     return vocab_size, encode, decode
 
 
-def get_finetunning_data(split, block_size, batch_size, encode):
+def get_finetunning_data(
+    split: str, block_size: int, batch_size: int, encode
+) -> tensor:
     filename = (
         "data/TruthfulQA/finetune_info.jsonl"
         if split == "train"
@@ -55,6 +58,24 @@ def get_finetunning_data(split, block_size, batch_size, encode):
     return data
 
 
+def get_med_data(split: str, block_size: int, batch_size: int, encode) -> tensor:
+    filename = (
+        "data/finetuning_med/preprocessed/train.txt"
+        if split == "train"
+        else "data/finetuning_med/preprocessed/val.txt"
+    )
+
+    with open(filename, "r", encoding="utf-8") as f:
+        text = f.read()
+    start_pos = random.randint(0, len(text) - block_size * batch_size)
+    end_pos = start_pos + block_size * batch_size
+
+    sample = text[start_pos:end_pos]
+    data = torch.tensor(encode(sample), dtype=torch.long)
+
+    return data
+
+
 def find_first_lower(arr: List, index: int):
     arr = reversed(arr)
     for element in arr:
@@ -62,19 +83,19 @@ def find_first_lower(arr: List, index: int):
             return element
 
 
-def get_random_chunk(split, block_size, batch_size, encode):
+def get_random_chunk(split: str, block_size: int, batch_size: int, encode) -> tensor:
     filename = (
         "data/preprocessed/train_split.txt"
         if split == "train"
         else "data/preprocessed/val_split.txt"
-    )  # noqa 5501
+    )
     with open(filename, "rb") as f:
         with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as mm:
             # Determine the file size and a random position to start reading
             file_size = len(mm)
             start_pos = random.randint(
                 0, (file_size) - block_size * batch_size
-            )  # noqa 5501
+            )
 
             # Seek to the random position and read the block of text
             mm.seek(start_pos)
@@ -83,7 +104,7 @@ def get_random_chunk(split, block_size, batch_size, encode):
             # Decode the block to a string, ignoring any invalid byte sequences
             decoded_block = block.decode("utf-8", errors="ignore").replace(
                 "\r", ""
-            )  # noqa 5501
+            )
 
             # Train and test splits
             data = torch.tensor(encode(decoded_block), dtype=torch.long)
@@ -92,30 +113,29 @@ def get_random_chunk(split, block_size, batch_size, encode):
 
 
 def get_batch(
-    split,
-    block_size,
-    batch_size,
+    split: str,
+    block_size: int,
+    batch_size: int,
     encode_fn,
     device: torch.device = "cuda:0",
     finetuning=False,
+    med=False,
 ):
     if finetuning:
         data = get_finetunning_data(
-            split=split,
-            block_size=block_size,
-            batch_size=batch_size,
-            encode=encode_fn,  # noqa 5501
+            split=split, block_size=block_size, batch_size=batch_size, encode=encode_fn
+        )
+    elif finetuning and med:
+        data = get_med_data(
+            split=split, block_size=block_size, batch_size=batch_size, encode=encode_fn
         )
     else:
         data = get_random_chunk(
-            split=split,
-            block_size=block_size,
-            batch_size=batch_size,
-            encode=encode_fn,  # noqa 5501
+            split=split, block_size=block_size, batch_size=batch_size, encode=encode_fn
         )
     ix = torch.randint(len(data) - block_size, (batch_size,))
-    x = torch.stack([data[i : i + block_size] for i in ix])
-    y = torch.stack([data[i + 1 : i + block_size + 1] for i in ix])
+    x = torch.stack([data[i: i + block_size] for i in ix])
+    y = torch.stack([data[i + 1: i + block_size + 1] for i in ix])
     x, y = x.to(device), y.to(device)
     return x, y
 
@@ -207,11 +227,11 @@ def plot_loss_curves(results):
 
 
 def main():
-    sample = get_finetunning_data(
+    sample = get_med_data(
         split="train", block_size=128, batch_size=32, encode="a"
     )
-    print(sample)
-    print(len(sample))
+    print(sample.item())
+    print(sample.shape())
 
 
 if __name__ == "__main__":

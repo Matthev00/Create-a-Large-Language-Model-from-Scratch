@@ -1,6 +1,5 @@
 import torch
 from utils import (
-    get_batch,
     prepare_vocab,
     save_model,
     parse_arguments,
@@ -19,7 +18,7 @@ def main():
     block_size = 128
     max_iters = args.max_iters
     learning_rate = args.lr
-    model_id = 11500
+    model_id = 100
 
     vocab_size, encode, decode = prepare_vocab()
 
@@ -27,7 +26,7 @@ def main():
 
     model.load_state_dict(
         torch.load(
-            f=f"models/GPT_Model_trained_{model_id}_epochs_finetuned.pth",
+            f=f"models/GPT_Model_trained_{model_id}_epochs_medical_finetunned.pth",
             map_location=torch.device(device),
         )
     )
@@ -38,9 +37,7 @@ def main():
         model=model,
         optimizer=optimizer,
         writer=create_writer(
-            experiment_name=f"{model_id}-{model_id+max_iters}_epochs",
-            model_name="GPT",
-            extra="finetuning",
+            experiment_name=f"{model_id}-{model_id+max_iters}_epochs", model_name="GPT"
         ),
         epochs=max_iters,
         encode=encode,
@@ -48,11 +45,12 @@ def main():
         block_size=block_size,
         batch_size=batch_size,
         finetuning=True,
+        med=True,
     )
 
     save_model(
         model=model,
-        model_name=f"GPT_Model_trained_{model_id+max_iters}_epochs_finetuned.pth", # noqa 5501
+        model_name=f"GPT_Model_trained_{model_idmax_iters}_epochs_medical_finetunned.pth",  # noqa 5501
     )
 
     plot_loss_curves(results=results)

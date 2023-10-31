@@ -14,7 +14,8 @@ def train(
     device: torch.device = "cuda:0",
     block_size: int = 128,
     batch_size: int = 32,
-    finetuning=False,
+    finetuning: bool = False,
+    med: bool = False
 ):
     """
     Trains and tests a PyTorch model.
@@ -50,6 +51,7 @@ def train(
             block_size=block_size,
             batch_size=batch_size,
             finetuning=finetuning,
+            med=med
         )
         test_loss = test_step(
             model=model,
@@ -58,6 +60,7 @@ def train(
             block_size=block_size,
             batch_size=batch_size,
             finetuning=finetuning,
+            med=med
         )
 
         results["train_loss"].append(train_loss)
@@ -80,7 +83,8 @@ def train_step(
     device: torch.device = "cuda:0",
     block_size: int = 128,
     batch_size: int = 32,
-    finetuning=False,
+    finetuning: bool = False,
+    med: bool = False
 ):
     """
     Trains a PyTorch model for single epoch
@@ -99,6 +103,7 @@ def train_step(
         encode_fn=encode,
         device=device,
         finetuning=finetuning,
+        med=med
     )
 
     logits, loss = model(X, y)
@@ -115,7 +120,8 @@ def test_step(
     device: torch.device = "cuda:0",
     block_size: int = 128,
     batch_size: int = 32,
-    finetuning=False,
+    finetuning: bool = False,
+    med: bool = False
 ):
     model.eval()
     with torch.inference_mode():
@@ -126,6 +132,7 @@ def test_step(
             encode_fn=encode,
             device=device,
             finetuning=finetuning,
+            med=med
         )
         logits, loss = model(X, y)
 
