@@ -3,7 +3,7 @@ import lzma
 from tqdm import tqdm
 from pathlib import Path
 import json
-from typing import List
+from typing import List, Tuple
 
 
 def xz_files_in_dir(directory):
@@ -79,6 +79,12 @@ def extract_qa_from_json(file_path: Path) -> str:
 
 def get_paths(dir_path: Path) -> List[Path]:
     return [plik for plik in dir_path.iterdir() if plik.is_file()]
+
+
+def split_text(text: str,
+               train_split: float = 0.7) -> Tuple(str, str):
+    split_point = int(len(text) * train_split)
+    return text[split_point:], text[:split_point]
 
 
 def main():
