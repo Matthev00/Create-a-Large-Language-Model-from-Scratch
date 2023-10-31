@@ -1,6 +1,8 @@
 import os
 import lzma
 from tqdm import tqdm
+from pathlib import Path
+import json
 
 
 def xz_files_in_dir(directory):
@@ -61,16 +63,27 @@ def process_files(
             vfile.write(char + "\n")
 
 
+def extract_qa_from_json(file_path: Path) -> str:
+
+    with open(file_path, 'r') as f:
+        data = json.load(f)
+    text = ''
+
+    for sample in data:
+        q = sample['question']
+        a = sample['answer']
+        text += q.capitalize() + " " + a.capitalize() + ". "
+    return text
+
+
+def get_paths(dir_path: Path) -> List[Path]:
+
+
+
+
 def main():
-    folder_path = "E:/projekty python/Create-a-Large-Language-Model-from-Scratch/data/openwebtext"  # noqa 5501
-    files = xz_files_in_dir(folder_path)
-
-    files_train, files_val = split_files(files=files, train_percent=0.9)
-
-    process_files(
-        files_train=files_train, files_val=files_val, input_data=folder_path
-    )  # noqa 5501
-
+    dir_path = "E:/projekty python/Create-a-Large-Language-Model-from-Scratch/data/finetuning_med/raw"
+    
 
 if __name__ == "__main__":
     main()
