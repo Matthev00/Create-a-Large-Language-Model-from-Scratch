@@ -4,6 +4,7 @@ from tqdm import tqdm
 from pathlib import Path
 import json
 from typing import List, Tuple
+import re
 
 
 def xz_files_in_dir(directory):
@@ -65,14 +66,13 @@ def process_files(
 
 
 def extract_qa_from_json(file_path: Path) -> str:
-
-    with open(file_path, 'r') as f:
+    with open(file_path, "r") as f:
         data = json.load(f)
-    text = ''
+    text = ""
 
     for sample in data:
-        q = sample['question']
-        a = sample['answer']
+        q = sample["question"]
+        a = sample["answer"]
         text += q.capitalize() + " " + a.capitalize() + ". "
     return text
 
@@ -81,16 +81,37 @@ def get_paths(dir_path: Path) -> List[Path]:
     return [plik for plik in dir_path.iterdir() if plik.is_file()]
 
 
-def split_text(text: str,
-               train_split: float = 0.7) -> Tuple(str, str):
+def split_text(text: str, train_split: float = 0.7) -> Tuple[str, str]:
     split_point = int(len(text) * train_split)
-    return text[split_point:], text[:split_point]
+    return text[:split_point], text[split_point:]
+
+
+def create_train_val_medical_data(dir_path: Path):
+    input_dir = dir_path / "raw"
+    output_dir = dir_path / "preprocessed"
+    files = get_paths(dir_path=input_dir)
+
+    text = ""
+    for file_path in tqdm(files):
+        text += extract_qa_from_json(file_path=file_path)
+
+    train_text, val_text = split_text(text=text, train_split=0.8)
+    # save train data
+    train_file_path = output_dir / "train.txt"
+    with open(train_file_path, "w", encoding="utf-8") as f:
+        f.write(train_text)
+
+    # save val data
+    val_file_path = output_dir / "val.txt"
+    with open(val_file_path, "w", encoding="utf-8") as f:
+        f.write(val_text)
 
 
 def main():
-    dir_path = Path("E:/projekty python/Create-a-Large-Language-Model-from-Scratch/data/finetuning_med/raw")
-    file_paths = get_paths(dir_path=dir_path)
-    print(file_paths)
+    dir_path = Path(
+        "E:/projekty python/Create-a-Large-Language-Model-from-Scratch/data/finetuning_med"
+    )
+    create_train_val_medical_data(dir_path=dir_path)
 
 
 if __name__ == "__main__":
