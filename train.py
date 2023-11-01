@@ -18,7 +18,7 @@ def main():
     block_size = 128
     max_iters = args.max_iters
     learning_rate = args.lr
-    model_id = 100
+    model_id = 1100
 
     vocab_size, encode, decode = prepare_vocab()
 
@@ -50,7 +50,7 @@ def main():
 
     save_model(
         model=model,
-        model_name=f"GPT_Model_trained_{model_idmax_iters}_epochs_medical_finetunned.pth",  # noqa 5501
+        model_name=f"GPT_Model_trained_{model_id + max_iters}_epochs_medical_finetunned.pth",  # noqa 5501
     )
 
     plot_loss_curves(results=results)
