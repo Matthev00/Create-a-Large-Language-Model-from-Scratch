@@ -22,10 +22,12 @@ gpt-v1.ipynb - proces of my learnig learnig LLM's
 + reate new test and train step for training loop
 + train for longer
 + train on basic data for next 4000 iters
-- finetune to the medical version
++ finetune to the medical version
 
 # Isssues
 finetuning dameges results on basic model
+fatal results of finetuning
+model should take 1 question 1 answer and then in loss function it shoudl compera answer to answer not all tehst
 
 # Resources
 ## Create-a-Large-Language-Model-from-Scratch
