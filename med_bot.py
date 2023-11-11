@@ -15,12 +15,14 @@ def main():
         f="models/GPT_Model_trained_10000_epochs_medical_finetunned.pth",
         map_location=torch.device(device)))
 
-    prompt = torch.tensor(encode(input("Input question: ")),
+    inp = input("Input question: ")
+    in_len = len(input)
+    prompt = torch.tensor(encode(inp),
                           dtype=torch.long, device=device)
     response = model.generate(prompt.unsqueeze(0),
                               max_new_tokens=1000)[0].tolist()
     decoded_text = decode(response)
-    print(decoded_text)
+    print("A: " + decoded_text[in_len:])
 
 
 if __name__ == "__main__":
