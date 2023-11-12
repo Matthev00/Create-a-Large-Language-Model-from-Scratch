@@ -3,7 +3,7 @@ import lzma
 from tqdm import tqdm
 from pathlib import Path
 import json
-from typing import List, Tuple, Dict
+from typing import List, Tuple
 
 
 def xz_files_in_dir(directory):
@@ -130,10 +130,10 @@ def create_train_val_med_q_and_a(dir_path: Path):
     train_data, val_data = split_json(data=qa_data, train_split=0.7)
 
     with open(output_dir / "train_qa_data.json", "w", encoding="utf-8") as outfile:
-        json.dump(train_data, outfile, indent=4)
+        json.dump(train_data, outfile, indent=2)
 
     with open(output_dir / "val_qa_data.json", "w", encoding="utf-8") as outfile:
-        json.dump(val_data, outfile, indent=4)
+        json.dump(val_data, outfile, indent=2)
 
 
 def main():
