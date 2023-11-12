@@ -3,7 +3,7 @@ import lzma
 from tqdm import tqdm
 from pathlib import Path
 import json
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 
 def xz_files_in_dir(directory):
@@ -85,6 +85,14 @@ def split_text(text: str, train_split: float = 0.7) -> Tuple[str, str]:
     return text[:split_point], text[split_point:]
 
 
+def split_json(
+    data, train_split: float = 0.7
+) -> Tuple:
+
+    split_point = int(len(data) * train_split)
+    return data[:split_point], data[split_point:]
+
+
 def create_train_val_medical_data(dir_path: Path):
     input_dir = dir_path / "raw"
     output_dir = dir_path / "preprocessed"
@@ -106,11 +114,33 @@ def create_train_val_medical_data(dir_path: Path):
         f.write(val_text)
 
 
+def create_train_val_med_q_and_a(dir_path: Path):
+    input_dir = dir_path / "raw"
+    output_dir = dir_path / "preprocessed"
+    files = get_paths(dir_path=input_dir)
+
+    data = []
+    for file in files:
+        with open(file, "r", encoding="utf-8") as f:
+            data += json.load(f)
+
+    qa_data = [
+        {"question": item["question"], "answer": item["answer"]} for item in data
+    ]
+    train_data, val_data = split_json(data=qa_data, train_split=0.7)
+
+    with open(output_dir / "train_qa_data.json", "w", encoding="utf-8") as outfile:
+        json.dump(train_data, outfile, indent=4)
+
+    with open(output_dir / "val_qa_data.json", "w", encoding="utf-8") as outfile:
+        json.dump(val_data, outfile, indent=4)
+
+
 def main():
     dir_path = Path(
         "E:/projekty python/Create-a-Large-Language-Model-from-Scratch/data/finetuning_med"
     )
-    create_train_val_medical_data(dir_path=dir_path)
+    create_train_val_med_q_and_a(dir_path=dir_path)
 
 
 if __name__ == "__main__":
