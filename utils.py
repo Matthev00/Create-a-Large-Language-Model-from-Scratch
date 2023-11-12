@@ -9,6 +9,7 @@ import os
 from datetime import datetime
 from matplotlib import pyplot as plt
 from typing import List
+import json
 
 
 def prepare_vocab(file_path="data/preprocessed/vocab.txt"):
@@ -76,6 +77,33 @@ def get_med_data(split: str, block_size: int, batch_size: int, encode) -> tensor
     return data
 
 
+def get_med_qa(split: str, block_size: int, batch_size: int, encode) -> tensor:
+    filename = (
+        "data/finetuning_med/preprocessed/train_qa_data.json"
+        if split == "train"
+        else "data/finetuning_med/preprocessed/val_qa_data.json"
+    )
+    with open(filename, 'r', encoding="utf-8") as f:
+        data = json.load(f)
+
+    rand_start = random.randint(0, len(data) - batch_size)
+    data = data[rand_start: rand_start + 32]
+    tekst = ""
+    for sample in data:
+        qa = sample["question"] + " " + sample["answer"]
+        add_len = block_size - len(qa)
+        if add_len > 0:
+            for _ in range(add_len):
+                qa += " "
+        else:
+            qa = qa[:block_size]
+        tekst += qa
+
+    data = torch.tensor(encode(tekst), dtype=torch.long)
+
+    return data
+
+
 def find_first_lower(arr: List, index: int):
     arr = reversed(arr)
     for element in arr:
@@ -121,19 +149,20 @@ def get_batch(
     finetuning=False,
     med=False,
 ):
-    if finetuning:
+    if finetuning and not med:
         data = get_finetunning_data(
             split=split, block_size=block_size, batch_size=batch_size, encode=encode_fn
         )
     elif finetuning and med:
-        data = get_med_data(
+        data = get_med_qa(
             split=split, block_size=block_size, batch_size=batch_size, encode=encode_fn
         )
     else:
         data = get_random_chunk(
             split=split, block_size=block_size, batch_size=batch_size, encode=encode_fn
         )
-    ix = torch.randint(len(data) - block_size, (batch_size,))
+    ix = torch.randint(0, 31, (batch_size,))
+    ix *= block_size
     x = torch.stack([data[i: i + block_size] for i in ix])
     y = torch.stack([data[i + 1: i + block_size + 1] for i in ix])
     x, y = x.to(device), y.to(device)
