@@ -12,11 +12,11 @@ def main():
                              device=device)
 
     model.load_state_dict(torch.load(
-        f="models/GPT_Model_trained_10000_epochs_medical_finetunned.pth",
+        f="models/GPT_Model_med_2000_epochs.pth",
         map_location=torch.device(device)))
 
     inp = input("Input question: ")
-    in_len = len(input)
+    in_len = len(inp)
     prompt = torch.tensor(encode(inp),
                           dtype=torch.long, device=device)
     response = model.generate(prompt.unsqueeze(0),
