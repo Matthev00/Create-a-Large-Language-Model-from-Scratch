@@ -37,7 +37,8 @@ def main():
         model=model,
         optimizer=optimizer,
         writer=create_writer(
-            experiment_name=f"{model_id}-{model_id+max_iters}_epochs", model_name="GPT"
+            experiment_name=f"{model_id}-{model_id+max_iters}_epochs",
+            model_name="GPT"
         ),
         epochs=max_iters,
         encode=encode,
@@ -50,7 +51,7 @@ def main():
 
     save_model(
         model=model,
-        model_name=f"GPT_Model_trained_{model_id + max_iters}_epochs_medical_finetunned.pth",  # noqa 5501
+        model_name=f"GPT_Model_med_{max_iters}_epochs.pth"
     )
 
     plot_loss_curves(results=results)
