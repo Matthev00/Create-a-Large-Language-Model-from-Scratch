@@ -26,7 +26,7 @@ def main():
 
     model.load_state_dict(
         torch.load(
-            f=f"model/GPT_Model_med_{model_id}_epochs.pth",
+            f=f"models/GPT_Model_med_{model_id}_epochs.pth",
             map_location=torch.device(device),
         )
     )
