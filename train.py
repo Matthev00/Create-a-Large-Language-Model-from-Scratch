@@ -18,7 +18,7 @@ def main():
     block_size = 128
     max_iters = args.max_iters
     learning_rate = args.lr
-    model_id = 10000
+    model_id = 2000
 
     vocab_size, encode, decode = prepare_vocab()
 
@@ -26,7 +26,7 @@ def main():
 
     model.load_state_dict(
         torch.load(
-            f=f"models/GPT_Model_trained_{model_id}_epochs_medical_finetunned.pth",
+            f=f"model/GPT_Model_med_{model_id}_epochs.pth",
             map_location=torch.device(device),
         )
     )
@@ -51,7 +51,7 @@ def main():
 
     save_model(
         model=model,
-        model_name=f"GPT_Model_med_{max_iters}_epochs.pth"
+        model_name=f"GPT_Model_med_{model_id + max_iters}_epochs.pth"
     )
 
     plot_loss_curves(results=results)
