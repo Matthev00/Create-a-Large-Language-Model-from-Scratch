@@ -12,15 +12,17 @@ def main():
                              device=device)
 
     model.load_state_dict(torch.load(
-        f="models/GPT_Model_med_2000_epochs.pth",
+        f="models/GPT_Model_med_10000_epochs.pth",
         map_location=torch.device(device)))
 
     inp = input("Input question: ")
     in_len = len(inp)
     prompt = torch.tensor(encode(inp),
                           dtype=torch.long, device=device)
-    response = model.generate(prompt.unsqueeze(0),
-                              max_new_tokens=1000)[0].tolist()
+    model.eval()
+    with torch.inference_mode():
+        response = model.generate(prompt.unsqueeze(0),
+                                  max_new_tokens=100)[0].tolist()
     decoded_text = decode(response)
     print("A: " + decoded_text[in_len:])
 
